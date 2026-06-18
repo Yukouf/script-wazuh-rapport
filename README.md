@@ -27,6 +27,12 @@ poignée d'alertes réellement à traiter par un analyste.
 - Rapport **Excel** (synthèse + détail filtrable) et **PDF** (analyse lisible)
 - **Envoi automatique par email** à l'équipe
 
+Architecture de l'analyse par IA locale. Le script lit directement le journal d'alertes sur disque (sans passer par une API), puis soumet les alertes au modèle Ollama via un appel HTTP en local, garantissant qu'aucune donnée ne quitte le serveur.
+
+<img src="architecture_technique_ia_locale_memoire.png" width="100%">
+
+Intégration de l'IDS Suricata dans Wazuh. Suricata analyse le trafic réseau et écrit ses alertes dans le fichier eve.json. Wazuh lit ce fichier grâce à un bloc <localfile> déclaré dans ossec.conf, puis ingère les alertes IDS et les affiche dans son tableau de bord. L'ensemble tourne sur la même VM, donc la communication se fait par simple lecture de fichier, sans flux réseau entre les deux outils.
+
 <img src="suricata_wazuh_integration.png" width="100%">
 
 ---
