@@ -6,14 +6,14 @@
 Wazuh c'est une plateforme SIEM/XDR open source. Elle collecte les logs des agents installés sur les machines, les corrèle avec des règles de détection, et génère des alertes en temps réel. Elle fait aussi du FIM, de la détection de vulnérabilités, et de la conformité.
 
 Script Python qui lit les alertes d'un SIEM **Wazuh**, les trie et les classe
-automatiquement, puis génère et envoie par email un rapport **Excel** + **PDF**.
+automatiquement, puis génère un rapport **Excel**. Lorsque l'analyse IA locale est
+activée, il produit aussi un **PDF** explicatif. L'envoi par email reste optionnel.
 
 Ce que j'ai fait, c'est un programme qui lit toutes ces alertes automatiquement, fait le tri, et décide lesquelles sont juste du bruit et lesquelles méritent vraiment qu'on s'en occupe. Le script s'aide d'une petite intelligence artificielle qui tourne directement sur le serveur en local, donc rien ne sort en public, pour expliquer chaque alerte de manière simple et non technique. Et il y a une règle de sécurité : si une alerte touche à quelque chose de potentiellement grave, elle est toujours mise en avant, jamais ignorée, que cela soit en excel ou en PDF. Le script s'occupe d'envoyer un mail tout les jours à la même heure dans une boîte mail.
 
-L'objectif : transformer des centaines de milliers d'alertes hebdomadaires en une
-poignée d'alertes réellement à traiter par un analyste.
-
-> Sur une semaine type : **218 606 alertes** analysées → **9** classées « à investiguer ».
+L'objectif : réduire le bruit d'un volume important d'alertes et mettre en avant
+les événements réellement à vérifier. Le résultat dépend des règles Wazuh et des
+données de chaque environnement ; aucun taux de réduction universel n'est promis.
 
 ---
 
@@ -24,7 +24,7 @@ poignée d'alertes réellement à traiter par un analyste.
 - Logique « analyste sécurité » (SOC) appliquée **avant** l'IA, pour ne jamais masquer une alerte sensible (CVE, malware, PowerShell, RDP, exécutable déposé…)
 - Analyse complétée par une **IA locale** (Ollama) — aucune donnée envoyée à l'extérieur
 - Comparaison avec la semaine précédente : tendance, nouvelles règles, postes en hausse
-- Rapport **Excel** (synthèse + détail filtrable) et **PDF** (analyse lisible)
+- Rapport **Excel** dans tous les modes ; **PDF** lorsque l'analyse IA locale est activée
 - **Envoi automatique par email** à l'équipe
 
 Architecture de l'analyse par IA locale. Le script lit directement le journal d'alertes sur disque (sans passer par une API), puis soumet les alertes au modèle Ollama via un appel HTTP en local, garantissant qu'aucune donnée ne quitte le serveur.
@@ -71,8 +71,8 @@ ce que ça signifie, la cause probable, et l'action à mener.
 2. **Analyse** — il repère les alertes graves, les postes les plus touchés et les règles bruyantes.
 3. **Tri** — une logique SOC s'applique, complétée par une IA locale.
 4. **Classement** — chaque alerte importante reçoit un verdict (à investiguer / à vérifier / faux positif).
-5. **Rapports** — génération d'un Excel et d'un PDF, avec la tendance hebdomadaire.
-6. **Envoi** — les deux fichiers partent automatiquement par email.
+5. **Rapports** — génération d'un Excel ; l'analyse IA ajoute un PDF lisible.
+6. **Envoi** — optionnel, désactivable avec `--no-email`.
 
 ---
 
@@ -99,8 +99,8 @@ RDP ou un exécutable déposé est **forcée en « à investiguer »**, quel que
 ## Installation
 
 ```bash
-git clone https://github.com/TON_USER/TON_REPO.git
-cd TON_REPO
+git clone https://github.com/Yukouf/script-wazuh-rapport.git
+cd script-wazuh-rapport
 pip install openpyxl reportlab requests
 ```
 
@@ -137,6 +137,9 @@ sudo python3 rapport_wazuh.py --days 14      # période personnalisée
 sudo python3 rapport_wazuh.py --no-email     # générer sans envoyer
 sudo python3 rapport_wazuh.py --no-ai        # désactiver l'analyse IA
 ```
+
+> `--no-ai` ne nécessite pas Ollama et génère l'Excel uniquement. Le PDF est une
+> synthèse de l'analyse IA : il requiert donc Ollama et la bibliothèque `reportlab`.
 
 `sudo` sert uniquement à lire les journaux Wazuh.
 

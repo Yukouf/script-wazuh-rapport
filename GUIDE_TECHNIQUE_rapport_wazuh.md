@@ -1371,7 +1371,7 @@ sudo python3 rapport_wazuh.py --no-ai        # désactiver l'analyse IA
 Planification hebdomadaire (par ex. chaque lundi à 7h) via `crontab -e` :
 
 ```
-0 7 * * 1 cd /chemin/vers/TON_REPO && set -a && . ./.env && set +a && /usr/bin/python3 rapport_wazuh.py >> /var/log/rapport_wazuh.log 2>&1
+0 7 * * 1 cd /opt/script-wazuh-rapport && set -a && . ./.env && set +a && /usr/bin/python3 rapport_wazuh.py >> /var/log/rapport_wazuh.log 2>&1
 ```
 
 ## 16. Points à adapter
