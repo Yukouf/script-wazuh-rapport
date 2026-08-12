@@ -5,8 +5,8 @@
 =============================================================================
  RAPPORT HEBDOMADAIRE WAZUH
 =============================================================================
- Lecture directe des alertes Wazuh, generation d'un rapport Excel + PDF,
- puis envoi par email.
+ Lecture directe des alertes Wazuh, génération d'un rapport Excel,
+ analyse IA/PDF optionnelle, puis envoi par email configurable.
 
  Usage :
    sudo python3 rapport_wazuh.py
@@ -1196,7 +1196,7 @@ def main():
     if agent_changes:
         print(f"  {len(agent_changes)} agent(s) avec changement important")
 
-    print("\n[5/6] Generation Excel + PDF...")
+    print("\n[5/6] Génération Excel" + (" + PDF..." if not args.no_ai else "..."))
     ts = datetime.now().strftime("%Y%m%d")
     week = datetime.now().strftime("%W")
 
