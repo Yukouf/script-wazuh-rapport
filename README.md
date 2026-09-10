@@ -1,98 +1,94 @@
-# Rapport hebdomadaire de sécurité Wazuh
+# Weekly Wazuh security report
 
+<p align="center">
+  <a href="README.md">English</a> &bull;
+  <a href="README_fr.md">Français</a>
+</p>
 
 <img src="1704200958877.png" width="100%">
 
-Wazuh c'est une plateforme SIEM/XDR open source. Elle collecte les logs des agents installés sur les machines, les corrèle avec des règles de détection, et génère des alertes en temps réel. Elle fait aussi du FIM, de la détection de vulnérabilités, et de la conformité.
+Wazuh is an open source SIEM/XDR platform. It collects logs from agents installed on machines, correlates them with detection rules, and generates real-time alerts. It also handles FIM, vulnerability detection, and compliance.
 
-Script Python qui lit les alertes d'un SIEM **Wazuh**, les trie et les classe
-automatiquement, puis génère un rapport **Excel**. Lorsque l'analyse IA locale est
-activée, il produit aussi un **PDF** explicatif. L'envoi par email reste optionnel.
+Python script that reads the alerts of a **Wazuh** SIEM, sorts and classifies them automatically, then generates an **Excel** report. When the local AI analysis is enabled, it also produces an explanatory **PDF**. Email delivery remains optional.
 
-Ce que j'ai fait, c'est un programme qui lit toutes ces alertes automatiquement, fait le tri, et décide lesquelles sont juste du bruit et lesquelles méritent vraiment qu'on s'en occupe. Le script s'aide d'une petite intelligence artificielle qui tourne directement sur le serveur en local, donc rien ne sort en public, pour expliquer chaque alerte de manière simple et non technique. Et il y a une règle de sécurité : si une alerte touche à quelque chose de potentiellement grave, elle est toujours mise en avant, jamais ignorée, que cela soit en excel ou en PDF. Le script s'occupe d'envoyer un mail tout les jours à la même heure dans une boîte mail.
+The program reads all these alerts automatically, performs the sorting, and decides which are just noise and which genuinely deserve attention. The script relies on a small artificial intelligence model running directly on the server locally, so nothing is exposed publicly, to explain each alert in simple and non-technical terms. There is also a safety rule: if an alert touches something potentially serious, it is always highlighted, never ignored, whether in Excel or in PDF. The script sends an email every day at the same time to a mailbox.
 
-L'objectif : réduire le bruit d'un volume important d'alertes et mettre en avant
-les événements réellement à vérifier. Le résultat dépend des règles Wazuh et des
-données de chaque environnement ; aucun taux de réduction universel n'est promis.
+The goal: reduce the noise of a large volume of alerts and highlight the events that genuinely need review. The result depends on the Wazuh rules and on the data of each environment; no universal reduction rate is promised.
 
 ---
 
-## Fonctionnalités
+## Features
 
-- Lecture directe des journaux d'alertes Wazuh (fichier courant + archives `.gz`)
-- Classement automatique de chaque alerte importante : **À investiguer**, **À vérifier** ou **Faux positif**
-- Logique « analyste sécurité » (SOC) appliquée **avant** l'IA, pour ne jamais masquer une alerte sensible (CVE, malware, PowerShell, RDP, exécutable déposé…)
-- Analyse complétée par une **IA locale** (Ollama) — aucune donnée envoyée à l'extérieur
-- Comparaison avec la semaine précédente : tendance, nouvelles règles, postes en hausse
-- Rapport **Excel** dans tous les modes ; **PDF** lorsque l'analyse IA locale est activée
-- **Envoi automatique par email** à l'équipe
+- Direct reading of the Wazuh alert logs (current file + `.gz` archives)
+- Automatic classification of each significant alert: **Investigate**, **Review** or **False positive**
+- "Security analyst" (SOC) logic applied **before** the AI, so that a sensitive alert is never hidden (CVE, malware, PowerShell, RDP, dropped executable...)
+- Analysis completed by a **local AI** (Ollama), with no data sent outside
+- Comparison with the previous week: trend, new rules, hosts on the rise
+- **Excel** report in all modes; **PDF** when the local AI analysis is enabled
+- **Automatic delivery by email** to the team
 
-Architecture de l'analyse par IA locale. Le script lit directement le journal d'alertes sur disque (sans passer par une API), puis soumet les alertes au modèle Ollama via un appel HTTP en local, garantissant qu'aucune donnée ne quitte le serveur.
+Architecture of the local AI analysis. The script reads the alert log directly from disk (without going through an API), then submits the alerts to the Ollama model through a local HTTP call, guaranteeing that no data leaves the server.
 
 <img src="architecture_technique_ia_locale_memoire.png" width="100%">
 
-Intégration de l'IDS Suricata dans Wazuh. Suricata analyse le trafic réseau et écrit ses alertes dans le fichier eve.json. Wazuh lit ce fichier grâce à un bloc <localfile> déclaré dans ossec.conf, puis ingère les alertes IDS et les affiche dans son tableau de bord. L'ensemble tourne sur la même VM, donc la communication se fait par simple lecture de fichier, sans flux réseau entre les deux outils.
+Integration of the Suricata IDS into Wazuh. Suricata analyses network traffic and writes its alerts to the eve.json file. Wazuh reads this file through a <localfile> block declared in ossec.conf, then ingests the IDS alerts and displays them in its dashboard. The whole setup runs on the same VM, so the communication happens by simply reading a file, with no network flow between the two tools.
 
 <img src="suricata_wazuh_integration.png" width="100%">
 
 ---
 
-## Aperçu des livrables
+## Deliverables overview
 
-### Excel — onglet de synthèse
+### Excel: summary tab
 
 <img src="excel_resume.png" width="100%">
 
-Vue d'ensemble : nombre total d'alertes, combien sont graves, et celles à traiter en
-priorité. La ligne « tendance » montre l'évolution par rapport à la semaine précédente.
+Overview: total number of alerts, how many are serious, and those to handle as a priority. The "trend" line shows the change compared with the previous week.
 
-### Excel — détail de toutes les alertes
+### Excel: detail of all alerts
 
 <img src="excel_alertes.png" width="100%">
 
-La liste complète. Chaque alerte reçoit un verdict et une explication ; les colonnes
-sont triables et filtrables.
+The complete list. Each alert receives a verdict and an explanation; the columns are sortable and filterable.
 
-### PDF — analyse lisible, triée par priorité
+### PDF: readable analysis, sorted by priority
 
 <p>
   <img src="pdf_p1.png" width="49%">
   <img src="pdf_p2.png" width="49%">
 </p>
 
-La version la plus lisible : chaque alerte importante est résumée en trois points —
-ce que ça signifie, la cause probable, et l'action à mener.
+The most readable version: each significant alert is summarised in three points, what it means, the likely cause, and the action to take.
 
 ---
 
-## Comment ça marche
+## How it works
 
-1. **Lecture** — le script lit directement les journaux d'alertes de Wazuh.
-2. **Analyse** — il repère les alertes graves, les postes les plus touchés et les règles bruyantes.
-3. **Tri** — une logique SOC s'applique, complétée par une IA locale.
-4. **Classement** — chaque alerte importante reçoit un verdict (à investiguer / à vérifier / faux positif).
-5. **Rapports** — génération d'un Excel ; l'analyse IA ajoute un PDF lisible.
-6. **Envoi** — optionnel, désactivable avec `--no-email`.
-
----
-
-## L'IA utilisée
-
-- **Outil** : [Ollama](https://ollama.com) — exécution de modèles d'IA en local
-- **Modèle** : `gemma3:1b`
-- **Réglages** : température `0.1` (réponses stables), réponses courtes
-
-L'IA ne décide jamais seule : toute alerte évoquant une CVE, un malware, PowerShell,
-RDP ou un exécutable déposé est **forcée en « à investiguer »**, quel que soit l'avis du modèle.
+1. **Reading**: the script reads the Wazuh alert logs directly.
+2. **Analysis**: it identifies the serious alerts, the most affected hosts and the noisy rules.
+3. **Sorting**: SOC logic is applied, complemented by a local AI.
+4. **Classification**: each significant alert receives a verdict (investigate / review / false positive).
+5. **Reports**: generation of an Excel file; the AI analysis adds a readable PDF.
+6. **Delivery**: optional, can be disabled with `--no-email`.
 
 ---
 
-## Prérequis
+## The AI used
+
+- **Tool**: [Ollama](https://ollama.com), running AI models locally
+- **Model**: `gemma3:1b`
+- **Settings**: temperature `0.1` (stable answers), short responses
+
+The AI never decides on its own: any alert mentioning a CVE, a malware, PowerShell, RDP or a dropped executable is **forced to "investigate"**, whatever the opinion of the model.
+
+---
+
+## Requirements
 
 - Python 3
-- Accès en lecture aux journaux Wazuh (`/var/ossec/logs/alerts/`)
-- Bibliothèques : `openpyxl`, `reportlab`, `requests`
-- *(optionnel)* Ollama installé en local avec le modèle `gemma3:1b`
+- Read access to the Wazuh logs (`/var/ossec/logs/alerts/`)
+- Libraries: `openpyxl`, `reportlab`, `requests`
+- *(optional)* Ollama installed locally with the `gemma3:1b` model
 
 ---
 
@@ -108,66 +104,66 @@ pip install openpyxl reportlab requests
 
 ## Configuration
 
-Les secrets (identifiants SMTP, destinataires) ne sont **jamais** écrits dans le code.
-Ils sont lus depuis des variables d'environnement.
+The secrets (SMTP credentials, recipients) are **never** written in the code.
+They are read from environment variables.
 
-Copiez le modèle fourni puis renseignez vos valeurs :
+Copy the provided template, then fill in the real values:
 
 ```bash
 cp .env.example .env
-# éditez .env avec vos vraies valeurs
+# edit .env with the real values
 ```
 
-Avant de lancer le script, chargez ces variables dans votre session :
+Before running the script, load these variables into the session:
 
 ```bash
 set -a && source .env && set +a
 ```
 
-> ⚠️ Le fichier `.env` contient vos secrets : il est listé dans `.gitignore` et ne doit
-> **jamais** être poussé sur GitHub.
+> ⚠️ The `.env` file contains the secrets: it is listed in `.gitignore` and must
+> **never** be pushed to GitHub.
 
 ---
 
-## Utilisation
+## Usage
 
 ```bash
-sudo python3 rapport_wazuh.py                # rapport sur 7 jours (défaut)
-sudo python3 rapport_wazuh.py --days 14      # période personnalisée
-sudo python3 rapport_wazuh.py --no-email     # générer sans envoyer
-sudo python3 rapport_wazuh.py --no-ai        # désactiver l'analyse IA
+sudo python3 rapport_wazuh.py                # report over 7 days (default)
+sudo python3 rapport_wazuh.py --days 14      # custom period
+sudo python3 rapport_wazuh.py --no-email     # generate without sending
+sudo python3 rapport_wazuh.py --no-ai        # disable the AI analysis
 ```
 
-> `--no-ai` ne nécessite pas Ollama et génère l'Excel uniquement. Le PDF est une
-> synthèse de l'analyse IA : il requiert donc Ollama et la bibliothèque `reportlab`.
+> `--no-ai` does not require Ollama and generates the Excel file only. The PDF is a
+> summary of the AI analysis: it therefore requires Ollama and the `reportlab` library.
 
-`sudo` sert uniquement à lire les journaux Wazuh.
+`sudo` is used only to read the Wazuh logs.
 
 ---
 
 ## Documentation
 
-Le fonctionnement détaillé, **code et explications réunis section par section**, est dans
+The detailed operation, **code and explanations brought together section by section**, is in
 [`GUIDE_TECHNIQUE_rapport_wazuh.md`](GUIDE_TECHNIQUE_rapport_wazuh.md).
 
 ---
 
-## Structure du projet
+## Project structure
 
 ```
 .
-├── rapport_wazuh.py     # script principal
-├── .env.example         # modèle de configuration (sans valeurs réelles)
-├── .env                 # vos secrets — ignoré par git, jamais commité
+├── rapport_wazuh.py     # main script
+├── .env.example         # configuration template (without real values)
+├── .env                 # the secrets, ignored by git, never committed
 ├── .gitignore
-├──                 # captures utilisées dans ce README
+├──                 # screenshots used in this README
 └── README.md
 ```
 
 ---
 
-## Sécurité
+## Security
 
-- Dépôt recommandé en **privé** (code de supervision sécurité).
-- **Aucun secret dans le code** : tout passe par `.env` + variables d'environnement.
-- Si un identifiant a déjà été exposé, considérez-le comme compromis et **régénérez-le**.
+- Repository recommended as **private** (security monitoring code).
+- **No secret in the code**: everything goes through `.env` + environment variables.
+- If a credential has already been exposed, treat it as compromised and **regenerate it**.
