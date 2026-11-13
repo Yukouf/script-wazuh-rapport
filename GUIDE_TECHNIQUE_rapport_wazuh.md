@@ -1,4 +1,4 @@
-# Guide technique complet — `rapport_wazuh.py`
+# Guide technique complet : `rapport_wazuh.py`
 
 Document unique réunissant **le code complet et son explication**, section par section.
 Objectif : comprendre et redéployer le script de rapport hebdomadaire sur n'importe quel serveur Wazuh.
