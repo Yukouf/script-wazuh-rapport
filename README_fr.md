@@ -5,7 +5,7 @@
   <a href="README_fr.md">Français</a>
 </p>
 
-<img src="excel_resume.png" width="100%">
+<img src="pdf_p1.png" width="100%">
 
 Wazuh c'est une plateforme SIEM/XDR open source. Elle collecte les logs des agents installés sur les machines, les corrèle avec des règles de détection, et génère des alertes en temps réel. Elle fait aussi du FIM, de la détection de vulnérabilités, et de la conformité.
 
