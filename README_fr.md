@@ -26,7 +26,7 @@ données de chaque environnement ; aucun taux de réduction universel n'est prom
 - Lecture directe des journaux d'alertes Wazuh (fichier courant + archives `.gz`)
 - Classement automatique de chaque alerte importante : **À investiguer**, **À vérifier** ou **Faux positif**
 - Logique « analyste sécurité » (SOC) appliquée **avant** l'IA, pour ne jamais masquer une alerte sensible (CVE, malware, PowerShell, RDP, exécutable déposé…)
-- Analyse complétée par une **IA locale** (Ollama) — aucune donnée envoyée à l'extérieur
+- Analyse complétée par une **IA locale** (Ollama), sans rien envoyer à l'extérieur
 - Comparaison avec la semaine précédente : tendance, nouvelles règles, postes en hausse
 - Rapport **Excel** dans tous les modes ; **PDF** lorsque l'analyse IA locale est activée
 - **Envoi automatique par email** à l'équipe
@@ -43,46 +43,46 @@ Intégration de l'IDS Suricata dans Wazuh. Suricata analyse le trafic réseau et
 
 ## Aperçu des livrables
 
-### Excel — onglet de synthèse
+### Excel : onglet de synthèse
 
 <img src="excel_resume.png" width="100%">
 
 Vue d'ensemble : nombre total d'alertes, combien sont graves, et celles à traiter en
 priorité. La ligne « tendance » montre l'évolution par rapport à la semaine précédente.
 
-### Excel — détail de toutes les alertes
+### Excel : détail de toutes les alertes
 
 <img src="excel_alertes.png" width="100%">
 
 La liste complète. Chaque alerte reçoit un verdict et une explication ; les colonnes
 sont triables et filtrables.
 
-### PDF — analyse lisible, triée par priorité
+### PDF : analyse lisible, triée par priorité
 
 <p>
   <img src="pdf_p1.png" width="49%">
   <img src="pdf_p2.png" width="49%">
 </p>
 
-La version la plus lisible : chaque alerte importante est résumée en trois points —
+La version la plus lisible : chaque alerte importante est résumée en trois points :
 ce que ça signifie, la cause probable, et l'action à mener.
 
 ---
 
 ## Comment ça marche
 
-1. **Lecture** — le script lit directement les journaux d'alertes de Wazuh.
-2. **Analyse** — il repère les alertes graves, les postes les plus touchés et les règles bruyantes.
-3. **Tri** — une logique SOC s'applique, complétée par une IA locale.
-4. **Classement** — chaque alerte importante reçoit un verdict (à investiguer / à vérifier / faux positif).
-5. **Rapports** — génération d'un Excel ; l'analyse IA ajoute un PDF lisible.
-6. **Envoi** — optionnel, désactivable avec `--no-email`.
+1. **Lecture** : le script lit directement les journaux d'alertes de Wazuh.
+2. **Analyse** : il repère les alertes graves, les postes les plus touchés et les règles bruyantes.
+3. **Tri** : une logique SOC s'applique, complétée par une IA locale.
+4. **Classement** : chaque alerte importante reçoit un verdict (à investiguer / à vérifier / faux positif).
+5. **Rapports** : génération d'un Excel ; l'analyse IA ajoute un PDF lisible.
+6. **Envoi** : optionnel, désactivable avec `--no-email`.
 
 ---
 
 ## L'IA utilisée
 
-- **Outil** : [Ollama](https://ollama.com) — exécution de modèles d'IA en local
+- **Outil** : [Ollama](https://ollama.com), pour faire tourner des modèles d'IA en local
 - **Modèle** : `gemma3:1b`
 - **Réglages** : température `0.1` (réponses stables), réponses courtes
 
@@ -162,7 +162,7 @@ Le fonctionnement détaillé, **code et explications réunis section par section
 .
 ├── rapport_wazuh.py     # script principal
 ├── .env.example         # modèle de configuration (sans valeurs réelles)
-├── .env                 # vos secrets — ignoré par git, jamais commité
+├── .env                 # vos secrets, ignoré par git, jamais commité
 ├── .gitignore
 ├──                 # captures utilisées dans ce README
 └── README.md
